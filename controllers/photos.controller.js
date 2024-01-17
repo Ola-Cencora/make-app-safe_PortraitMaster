@@ -4,6 +4,7 @@ const Photo = require('../models/photo.model');
 
 exports.add = async (req, res) => {
 
+
   try {
     const { title, author, email } = req.fields;
     const file = req.files.file;
@@ -11,9 +12,14 @@ exports.add = async (req, res) => {
     if(title && author && email && file) { // if fields are not empty...
 
       const fileName = file.path.split('/').slice(-1)[0]; // cut only filename from full path, e.g. C:/test/abc.jpg -> abc.jpg
-      const newPhoto = new Photo({ title, author, email, src: fileName, votes: 0 });
-      await newPhoto.save(); // ...save new photo in DB
-      res.json(newPhoto);
+      const fileExt = fileName.split('.').slice(-1)[0];
+      if (fileExt === 'gif' || fileExt === 'jpg' || fileExt === 'png') {
+        const newPhoto = new Photo({ title, author, email, src: fileName, votes: 0 });
+        await newPhoto.save(); // ...save new photo in DB
+        res.json(newPhoto);      
+      } else {
+        throw new Error('Wrong file ext!');
+      }
 
     } else {
       throw new Error('Wrong input!');
